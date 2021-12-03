@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
     std::fstream input_1 = std::fstream(argv[1]);
     std::fstream input_2 = std::fstream(argv[1]);
 
-    int last_sum {};
     /* Move input_1 ahead. */
+    int last_sum {};
     for (int i {0}; i < K; i++) {
         int in {};
         input_1 >> in;
@@ -49,3 +49,5 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+// ./solution input.txt
