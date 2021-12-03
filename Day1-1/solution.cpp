@@ -1,21 +1,16 @@
 
-#include <iostream> // For std::cin and std::cout
+#include <iostream>
 
 /* There are definitely sexier approaches involving zips, but why mess with 
  * iteration. */
 int main() {
 
-    int last_height {}; // always initialize with {} just in case.
-    std::cin >> last_height; // This is standard input.
+    int last_height {};
+    std::cin >> last_height;
 
-    /*
-     * std::cin is an std::istream, and using >> on it returns another std:istream,
-     * so you can chain them. (Technically, it returns a reference to itself).
-     * Also, std::cin can be contextually converted to bool (it is true if it has not
-     * yet failed). Therefore...
-     */
     int next_height {};
     int increases = 0;
+    /* std::istream converts to true if it has not yet failed. */
     while (std::cin >> next_height) { // try to read an int, and perform one loop iteration if you succeeded.
         if (next_height > last_height)
             increases++;
@@ -23,8 +18,7 @@ int main() {
         last_height = next_height;
     }
 
-    /* This is standard output. */
-    std::cout << increases << '\n'; // always add '\n' or std::endl
+    std::cout << increases << '\n';
 
     return 0;
 }
