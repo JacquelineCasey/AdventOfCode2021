@@ -1,0 +1,9 @@
+# Ignore binaries (no extension): Ignore all, then unigore all with extensions,
+# then unignore directories
+*
+!*.*
+!*/
+
+# Other stuff
+.DS_Store
+.vscode/
