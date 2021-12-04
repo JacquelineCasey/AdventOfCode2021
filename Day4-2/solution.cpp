@@ -14,6 +14,8 @@ public:
     static constexpr int HEIGHT {5};
 
     friend std::istream& operator>>(std::istream& in, BingoBoard& board) {
+        board = {}; // Reset the board variable!
+
         for (int x : std::ranges::views::iota(0, WIDTH)) {
             for (int y : std::ranges::views::iota(0, HEIGHT)) {
                 int num {};
@@ -99,8 +101,9 @@ int main() {
     BingoBoard nextBoard {};
     while (std::cin >> nextBoard) {
         boards.push_back(nextBoard);
-        nextBoard = BingoBoard {}; // Reinitialize
     }
 
     std::cout << run_bingo(called_numbers, boards) << "\n";
+    
+    return 0;
 }
