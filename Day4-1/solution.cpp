@@ -13,19 +13,7 @@ public:
     static constexpr int WIDTH {5};
     static constexpr int HEIGHT {5};
 
-    friend std::istream& operator>>(std::istream& in, BingoBoard& board) {
-        board = {}; // Reset the board variable!
-
-        for (int x : std::ranges::views::iota(0, WIDTH)) {
-            for (int y : std::ranges::views::iota(0, HEIGHT)) {
-                int num {};
-                in >> num;
-                board.num_to_location[num] = {x, y};
-            }
-        }
-
-        return in;
-    }
+    friend std::istream& operator>>(std::istream& in, BingoBoard& board);
 
     /* Returns true one BINGO! */    
     bool update(int new_num) {
@@ -55,6 +43,20 @@ private:
     std::array<int, WIDTH> column_counts {};
     std::array<int, HEIGHT> row_counts {};
 };
+
+std::istream& operator>>(std::istream& in, BingoBoard& board) {
+    board = {}; // Reset the board variable!
+
+    for (int x : std::ranges::views::iota(0, BingoBoard::WIDTH)) {
+        for (int y : std::ranges::views::iota(0, BingoBoard::HEIGHT)) {
+            int num {};
+            in >> num;
+            board.num_to_location[num] = {x, y};
+        }
+    }
+
+    return in;
+}
 
 /* Returns the score of the winning board */
 int run_bingo(const std::vector<int>& called_numbers, std::vector<BingoBoard>& boards) {
