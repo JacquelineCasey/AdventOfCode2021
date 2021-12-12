@@ -26,7 +26,7 @@ T shift_left(std::array<T, NUM>& arr) {
     return retval;
 }
 
-constexpr int DAYS {256}; // Set to 80 for part 1.
+constexpr int DAYS {80};
 
 int main() {
     std::array<long, 9> number_at_time {};
