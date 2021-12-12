@@ -13,14 +13,15 @@
 constexpr int K = 3;
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        std::cout << "Please input the name of a file to read from.\n";
-        return 0;
+    std::string file_name {"input.txt"};
+
+    if (argc >= 2) {
+        file_name = argv[1];
     }
 
     /* input_1 runs ahead, input_2 runs k behind. */
-    std::fstream input_1 = std::fstream(argv[1]);
-    std::fstream input_2 = std::fstream(argv[1]);
+    std::fstream input_1 = std::fstream(file_name);
+    std::fstream input_2 = std::fstream(file_name);
 
     /* Move input_1 ahead. */
     int last_sum {};
