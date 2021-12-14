@@ -8,6 +8,6 @@ do
         echo "[Compiling Solution]"
         g++-11 -std=c++20 -Wall -Wextra -Werror -Wpedantic solution.cpp -o solution
         echo "[Running]"
-        ./solution < input.txt
+        time ./solution < input.txt
     )
 done
