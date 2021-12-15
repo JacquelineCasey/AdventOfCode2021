@@ -2,12 +2,14 @@
 #include <array>
 #include <iostream>
 #include <queue>
-#include <map>
+#include <unordered_map> // Using this instead of <map> now
 #include <vector>
 
 /* The only change involves setting up the array. The previous algorithm was strong
- * enough to survive a 25 fold increase in elements. */
-
+ * enough to survive a 25 fold increase in elements. However, I wanted to see if
+ * I could improve the algorithm my using a hashtable instead of a tree, which
+ * required creating a hash function for pairs of positive ints. Doing this makes
+ * the time (with no optimizations) go from ~2s to ~.8s, which is nice. */
 
 /* node_queue sorts lexicorgraphically, putting small elements (low priorities) first. */
 using queue_elem = std::pair<int, std::pair<int, int>>;
@@ -17,11 +19,23 @@ constexpr std::array<std::pair<int, int>, 4> adjacent {{
     {1, 0}, {0, 1}, {-1, 0}, {0, -1}
 }};
 
+/* Overriding this allows us to use an unordered_map (aka hashtable). */
+template<>
+struct std::hash<std::pair<int, int>> {
+    const std::hash<int> hash_int {std::hash<int>()};
+
+    std::size_t operator()(const std::pair<int, int>& p) const noexcept {
+        /* https://stackoverflow.com/questions/37918951/what-is-a-minimal-hash-function-for-a-pair-of-ints-that-has-low-chance-of-collis */
+        size_t n = p.first + p.second;
+        return ((n*(n+1)) / 2) + p.first;
+    }
+};
+
 int best_path_risk(const std::vector<std::vector<int>>& risk_levels) {
     int size {static_cast<int>(risk_levels.size())}; // The shape is a square.
 
     /* Representing the total risk to get to a given space. */
-    std::map<std::pair<int, int>, int> known_risks {{{0, 0}, 0}};
+    std::unordered_map<std::pair<int, int>, int> known_risks {{{0, 0}, 0}};
 
     /* Representing the estimated risk of adjacent nodes. Stores (total_risk, (row, col))
      * values, sorted lexicorgraphically. May contain old entries correspond to 
