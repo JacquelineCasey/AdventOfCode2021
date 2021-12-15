@@ -30,7 +30,7 @@ int best_path_risk(const std::vector<std::vector<int>>& risk_levels) {
     risk_estimates.push({risk_levels[0][1], {0, 1}});
     risk_estimates.push({risk_levels[1][0], {1, 0}});
 
-    while (!known_risks.contains({size - 1, size -1})) {
+    while (!known_risks.contains({size - 1, size - 1})) {
         auto [risk, pair] = risk_estimates.top();
         risk_estimates.pop();
 
