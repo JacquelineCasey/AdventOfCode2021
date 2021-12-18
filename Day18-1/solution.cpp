@@ -101,6 +101,9 @@ private:
         if (right_ptr != nullptr)
             std::get<LeafNode>(right_ptr->node).number += std::get<LeafNode>(bn.right->node).number;
 
+        delete std::get<BranchNode>(ptr->node).left;
+        delete std::get<BranchNode>(ptr->node).right;
+
         ptr->node = LeafNode {0};
 
         return true;
@@ -143,8 +146,6 @@ private:
 public:
     friend std::istream& operator>>(std::istream& in, SnailfishNumber& num);
 
-    friend std::ostream& operator<<(std::ostream& out, const SnailfishNumber& num);
-
     static SnailfishNumber* append(SnailfishNumber* l, SnailfishNumber* r) {
         SnailfishNumber* result = new SnailfishNumber();
         BranchNode result_bn {};
@@ -176,34 +177,12 @@ public:
         return result;
     }
 
-    SnailfishNumber() = default;
-
     int magnitude() {
         if (std::holds_alternative<LeafNode>(node))
             return std::get<LeafNode>(node).number;
 
         BranchNode& bn {std::get<BranchNode>(node)};
         return 3 * bn.left->magnitude() + 2 * bn.right->magnitude();
-    }
-
-    void full_print(int indent = 0) {
-        for (int i {0}; i < indent; i++)
-            std::cout << ' ';
-
-        std::cout << this << " |";
-        std::cout << " Parent: " << this->parent;
-        std::cout << " Position: " << (this->position == Position::Root ? "Root" :
-                                      (this->position == Position::Left ? "Left" :
-                                                                          "Right"));
-
-        if (std::holds_alternative<LeafNode>(node)) {
-            std::cout << " | Value: " << std::get<LeafNode>(node).number << '\n';
-            return;
-        }
-
-        std::cout << ": \n";
-        std::get<BranchNode>(node).left->full_print(indent + 4);
-        std::get<BranchNode>(node).right->full_print(indent + 4);                                         
     }
 };
 
@@ -245,25 +224,11 @@ std::istream& operator>>(std::istream& in, SnailfishNumber& num) {
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const SnailfishNumber& num) {
-    static int nesting {0};
-
-    if (std::holds_alternative<LeafNode>(num.node)) 
-        return out << std::get<LeafNode>(num.node).number;
-
-    nesting++;
-    if (nesting > 4)
-        out << '*';
-
-    const BranchNode& bn {std::get<BranchNode>(num.node)};
-    out << '[' << *bn.left << ',' << *bn.right << ']';
-    nesting--;
-
-    return out;
-}
-
 /* I spent way to long debugging this, so now my code is littered with raw pointers,
- * and allocations I am too lazy to hunt down and free. */
+ * and allocations I am too lazy to hunt down and free.
+ *
+ * Edit: After submission, I did go back and plug the memory leak (at least the
+ * major one.) */
 
 int main() {  
     SnailfishNumber* n = new SnailfishNumber();
@@ -272,12 +237,9 @@ int main() {
     SnailfishNumber* next = new SnailfishNumber();
     while (std::cin >> *next) {
         n = SnailfishNumber::append(n, next);
-
         next = new SnailfishNumber();
     }
 
-    std::cout << *n << '\n';
-    n->full_print();
     std::cout << n->magnitude() << '\n';
 
     return 0;

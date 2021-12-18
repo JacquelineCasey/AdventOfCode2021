@@ -1,6 +1,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <variant>
 #include <vector>
@@ -9,8 +10,8 @@ class SnailfishNumber;
 
 struct BranchNode {
 public:
-    SnailfishNumber* left {nullptr};
-    SnailfishNumber* right {nullptr}; 
+    std::unique_ptr<SnailfishNumber> left {nullptr};
+    std::unique_ptr<SnailfishNumber> right {nullptr}; 
 };
 
 struct LeafNode {
@@ -42,11 +43,11 @@ private:
             return nullptr; // No left neighbor;
 
         /* Now get the current node's sibling (which will be on the left) */
-        current = std::get<BranchNode>(current->parent->node).left;
+        current = std::get<BranchNode>(current->parent->node).left.get();
 
         /* The rightmost child of this sibling is our left neighbor */
         while (std::holds_alternative<BranchNode>(current->node)) {
-            current = std::get<BranchNode>(current->node).right;
+            current = std::get<BranchNode>(current->node).right.get();
         }
         
         return current;
@@ -54,22 +55,22 @@ private:
 
     SnailfishNumber* get_right_neighbor() {
         SnailfishNumber* current {this};
-
+       
         /* Move up until we have node on the left of its enclosing pair. */
         while (current->position == Position::Right) {
             current = current->parent;
         }
-
+        
         if (current->position == Position::Root)
             return nullptr; // No right neighbor;
-
+         
         /* Now get the current node's sibling (which will be on the right) */
-        current = std::get<BranchNode>(current->parent->node).right;
+        current = std::get<BranchNode>(current->parent->node).right.get();
 
         /* The leftmost child of this sibling is our right neighbor */
         while (std::holds_alternative<BranchNode>(current->node)) {
-            current = std::get<BranchNode>(current->node).left;
-        }
+            current = std::get<BranchNode>(current->node).left.get();  
+        }       
 
         return current;
     }
@@ -95,7 +96,7 @@ private:
 
         BranchNode& bn {std::get<BranchNode>(ptr->node)};
         SnailfishNumber* left_ptr {ptr->get_left_neighbor()};
-        SnailfishNumber* right_ptr {ptr->get_right_neighbor()};   
+        SnailfishNumber* right_ptr {ptr->get_right_neighbor()}; 
 
         if (left_ptr != nullptr)
             std::get<LeafNode>(left_ptr->node).number += std::get<LeafNode>(bn.left->node).number;
@@ -127,8 +128,8 @@ private:
         int big_number {std::get<LeafNode>(ptr->node).number};
 
         BranchNode new_bn {};
-        new_bn.left = new SnailfishNumber();
-        new_bn.right = new SnailfishNumber();
+        new_bn.left = std::make_unique<SnailfishNumber>();
+        new_bn.right = std::make_unique<SnailfishNumber>();
 
         new_bn.left->parent = ptr;
         new_bn.right->parent = ptr;
@@ -137,32 +138,44 @@ private:
         new_bn.left->node = LeafNode({big_number / 2});
         new_bn.right->node = LeafNode({big_number / 2 + big_number % 2});
 
-        ptr->node = new_bn;
+        ptr->node = std::move(new_bn);
         return true;
     }
 
 public:
+    SnailfishNumber() = default;
+
+    SnailfishNumber(SnailfishNumber&& moved) {
+        node = std::move(moved.node);
+        position = moved.position;
+        parent = moved.parent;
+
+        /* If we get a new address, we must tell our children. */
+        if (std::holds_alternative<BranchNode>(node)) {
+            std::get<BranchNode>(node).left->parent = this;
+            std::get<BranchNode>(node).right->parent = this;
+        }
+    } 
+
     friend std::istream& operator>>(std::istream& in, SnailfishNumber& num);
 
-    friend std::ostream& operator<<(std::ostream& out, const SnailfishNumber& num);
-
-    static SnailfishNumber* append(SnailfishNumber* l, SnailfishNumber* r) {
-        SnailfishNumber* result = new SnailfishNumber();
+    static std::unique_ptr<SnailfishNumber> append(SnailfishNumber&& l, SnailfishNumber&& r) {
+        std::unique_ptr<SnailfishNumber> result {std::make_unique<SnailfishNumber>()};
         BranchNode result_bn {};
-        result_bn.left = l;
-        result_bn.right = r;
+        result_bn.left = std::make_unique<SnailfishNumber>(std::move(l));
+        result_bn.right = std::make_unique<SnailfishNumber>(std::move(r));
 
-        result_bn.left->parent = result;
-        result_bn.right->parent = result;
+        result_bn.left->parent = result.get();
+        result_bn.right->parent = result.get();
         result_bn.left->position = SnailfishNumber::Position::Left;
         result_bn.right->position = SnailfishNumber::Position::Right;
 
-        result->node = result_bn;
+        result->node = std::move(result_bn);
 
         int step {0};
         while (true) {
             step++;
-            
+
             if (result->try_explode()) {
                 continue;
             }
@@ -177,34 +190,12 @@ public:
         return result;
     }
 
-    SnailfishNumber() = default;
-
     int magnitude() {
         if (std::holds_alternative<LeafNode>(node))
             return std::get<LeafNode>(node).number;
 
         BranchNode& bn {std::get<BranchNode>(node)};
         return 3 * bn.left->magnitude() + 2 * bn.right->magnitude();
-    }
-
-    void full_print(int indent = 0) {
-        for (int i {0}; i < indent; i++)
-            std::cout << ' ';
-
-        std::cout << this << " |";
-        std::cout << " Parent: " << this->parent;
-        std::cout << " Position: " << (this->position == Position::Root ? "Root" :
-                                      (this->position == Position::Left ? "Left" :
-                                                                          "Right"));
-
-        if (std::holds_alternative<LeafNode>(node)) {
-            std::cout << " | Value: " << std::get<LeafNode>(node).number << '\n';
-            return;
-        }
-
-        std::cout << ": \n";
-        std::get<BranchNode>(node).left->full_print(indent + 4);
-        std::get<BranchNode>(node).right->full_print(indent + 4);                                         
     }
 };
 
@@ -225,8 +216,8 @@ std::istream& operator>>(std::istream& in, SnailfishNumber& num) {
         return in;
     }
     num.node = BranchNode {};
-    std::get<BranchNode>(num.node).left = new SnailfishNumber();
-    std::get<BranchNode>(num.node).right = new SnailfishNumber();
+    std::get<BranchNode>(num.node).left = std::make_unique<SnailfishNumber>();
+    std::get<BranchNode>(num.node).right = std::make_unique<SnailfishNumber>();
     in >> *std::get<BranchNode>(num.node).left >> buf >> *std::get<BranchNode>(num.node).right;
     if (buf != ',' || in.fail()) {
         in.setstate(std::ios::failbit);
@@ -246,24 +237,7 @@ std::istream& operator>>(std::istream& in, SnailfishNumber& num) {
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const SnailfishNumber& num) {
-    static int nesting {0};
-
-    if (std::holds_alternative<LeafNode>(num.node)) 
-        return out << std::get<LeafNode>(num.node).number;
-
-    nesting++;
-    if (nesting > 4)
-        out << '*';
-
-    const BranchNode& bn {std::get<BranchNode>(num.node)};
-    out << '[' << *bn.left << ',' << *bn.right << ']';
-    nesting--;
-
-    return out;
-}
-
-/* Again, I am neglecting the massive memory leak that is this program. */
+/* After my first attempt, I made this even more memory safe by using unique pointers. */
 
 int main() {  
     std::vector<std::string> inputs {};
@@ -279,12 +253,12 @@ int main() {
             if (j == i)
                 continue;
 
-            SnailfishNumber* a = new SnailfishNumber(); 
-            std::istringstream(inputs[i]) >> *a;
-            SnailfishNumber* b = new SnailfishNumber();
-            std::istringstream(inputs[j]) >> *b;
+            SnailfishNumber a = SnailfishNumber(); 
+            std::istringstream(inputs[i]) >> a;
+            SnailfishNumber b = SnailfishNumber();
+            std::istringstream(inputs[j]) >> b;
 
-            SnailfishNumber* res = SnailfishNumber::append(a, b);
+            std::unique_ptr<SnailfishNumber> res = SnailfishNumber::append(std::move(a), std::move(b));
             int mag {res->magnitude()};
 
             if (mag > best_magnitude)
