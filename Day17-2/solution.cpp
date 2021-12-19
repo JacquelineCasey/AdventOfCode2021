@@ -62,7 +62,7 @@ bool simulate(int vx, int vy, int t_steps) {
 int main() {
     int x_max {target_range[1]};
     int x_min {0};
-    int x_stop_min; // Where x reaches 0 for x_min;
+    int x_stop_min {0};  // Where x reaches 0 for x_min;
     while (x_stop_min < target_range[0]) {
         x_min++;
         x_stop_min += x_min;
