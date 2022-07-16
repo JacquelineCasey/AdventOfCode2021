@@ -75,7 +75,7 @@ void slice_x_bounds(Grid& grid, const std::vector<Instruction> instructions) {
         slice_left_bounds.push_back(instruction.x1);
         slice_left_bounds.push_back(instruction.x2 + 1); // Left bound of right neighbor.
     }
-    std::ranges::sort(slice_left_bounds);
+    std::sort(slice_left_bounds.begin(), slice_left_bounds.end());
 
     for (int i {0}; i < static_cast<int>(slice_left_bounds.size() - 1); i++) {
         XSlice curr {};
@@ -103,7 +103,7 @@ void slice_y_bounds(Grid& grid, const std::vector<Instruction> instructions) {
 
     /* Perform the slices from those vectors. */
     for (auto& [_, x_slice] : grid.slices) {
-        std::ranges::sort(x_slice.y_low_bounds);
+        std::sort(x_slice.y_low_bounds.begin(), x_slice.y_low_bounds.end());
 
         for (int i {0}; i < static_cast<int>(x_slice.y_low_bounds.size() - 1); i++) {
             YSlice curr {};
@@ -139,7 +139,7 @@ void slice_z_bounds(Grid& grid, const std::vector<Instruction> instructions) {
     /* Perform the slices from those vectors. */
     for (auto& [_, x_slice] : grid.slices) {
         for (auto& [_, y_slice] : x_slice.slices) {
-            std::ranges::sort(y_slice.z_low_bounds);
+            std::sort(y_slice.z_low_bounds.begin(), y_slice.z_low_bounds.end());
 
             for (int i {0}; i < static_cast<int>(y_slice.z_low_bounds.size() - 1); i++) {
                 Region curr {};

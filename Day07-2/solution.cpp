@@ -43,7 +43,7 @@ int main() {
         std::cin >> _; // ','
     }
 
-    std::ranges::sort(positions);
+    std::sort(positions.begin(), positions.end());
     int lowest_pos {positions[0]};
     int highest_pos {positions[positions.size() - 1]};
 

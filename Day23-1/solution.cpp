@@ -16,13 +16,13 @@ public:
     int x_loc {};
 };
 
-constexpr std::array<Room, 4> start_rooms {
-  { {'A', '.', '.', 2},
-    {'B', '.', '.', 4},
-    {'C', '.', '.', 6},
-    {'D', '.', '.', 8}
-  }
-};
+// constexpr std::array<Room, 4> start_rooms {
+//   { {'A', '.', '.', 2},
+//     {'B', '.', '.', 4},
+//     {'C', '.', '.', 6},
+//     {'D', '.', '.', 8}
+//   }
+// };
 
 constexpr std::array<int, 4> energies {
     1, 10, 100, 1000
@@ -58,7 +58,9 @@ public:
 
     friend std::strong_ordering operator<=>(const State& lhs, const State& rhs) {
         if (lhs.hallway_spots != rhs.hallway_spots)
-            return lhs.hallway_spots <=> rhs.hallway_spots;
+            return (lhs.hallway_spots < rhs.hallway_spots) 
+                ? std::strong_ordering::less 
+                : std::strong_ordering::greater;
         for (int i {0}; i < 4; i++) {
             if (lhs.rooms[i].front != rhs.rooms[i].front)
                 return lhs.rooms[i].front <=> rhs.rooms[i].front;

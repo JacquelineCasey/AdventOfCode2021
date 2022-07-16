@@ -231,8 +231,8 @@ public:
                 t = t - offset;
             }
 
-            std::ranges::sort(transformed);
-            std::ranges::sort(other_transformed);
+            std::sort(transformed.begin(), transformed.end());
+            std::sort(other_transformed.begin(), other_transformed.end());
 
             std::vector<Triple> common_points {};
             std::set_intersection(transformed.begin(), transformed.end(),

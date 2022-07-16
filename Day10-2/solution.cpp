@@ -95,7 +95,7 @@ int main() {
         }
     }
 
-    std::ranges::sort(scores);
+    std::sort(scores.begin(), scores.end());
     std::cout << "Middle Score: " << scores[scores.size() / 2] << '\n';
 
     return 0;

@@ -27,7 +27,7 @@ int main() {
         std::cin >> _; // ','
     }
 
-    std::ranges::sort(positions);
+    std::sort(positions.begin(), positions.end());
     int median = positions[positions.size() / 2];
 
     int total_deviation {0};

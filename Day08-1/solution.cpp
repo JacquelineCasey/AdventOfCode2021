@@ -12,7 +12,7 @@ void parse_line(std::string line, std::vector<std::string>& digits, std::vector<
     for (int i {0}; i < 10; i++) {
         std::string digit {};
         sstream >> digit;
-        std::ranges::sort(digit);
+        std::sort(digit.begin(), digit.end());
         digits.push_back(digit);
     }
 
@@ -22,7 +22,7 @@ void parse_line(std::string line, std::vector<std::string>& digits, std::vector<
     for (int i {0}; i < 4; i++) {
         std::string digit {};
         sstream >> digit;
-        std::ranges::sort(digit);
+        std::sort(digit.begin(), digit.end());
         to_decode.push_back(digit);
     }
 }

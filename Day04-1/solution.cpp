@@ -47,8 +47,8 @@ private:
 std::istream& operator>>(std::istream& in, BingoBoard& board) {
     board = {}; // Reset the board variable!
 
-    for (int x : std::ranges::views::iota(0, BingoBoard::WIDTH)) {
-        for (int y : std::ranges::views::iota(0, BingoBoard::HEIGHT)) {
+    for (int x {0}; x < BingoBoard::WIDTH; x++) {
+        for (int y {0}; y < BingoBoard::HEIGHT; y++) {
             int num {};
             in >> num;
             board.num_to_location[num] = {x, y};

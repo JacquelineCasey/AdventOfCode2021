@@ -31,7 +31,7 @@ std::bitset<NUM_BITS> find_line(const std::vector<std::bitset<NUM_BITS>>& input,
         bool look_for = prefered_bit(remaining, index, wants_greater);
 
         std::vector<std::bitset<NUM_BITS>> next_remaining {};
-        std::ranges::copy_if(remaining, std::back_inserter(next_remaining), [=](auto current) {
+        std::copy_if(remaining.begin(), remaining.end(), std::back_inserter(next_remaining), [=](auto current) {
             return current[index] == look_for;
         });
 

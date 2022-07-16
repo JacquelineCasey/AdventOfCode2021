@@ -41,7 +41,7 @@ private:
     class Iterator {
     public:
         Iterator(const Line& line) : 
-            line {line}, 
+            // line {line}, 
             step {get_step(line)},
             current {line.p1}
         {}; 
@@ -97,7 +97,7 @@ private:
         }
 
 
-        const Line& line;
+        // const Line& line;
 
         const Point2D step;
         Point2D current;
