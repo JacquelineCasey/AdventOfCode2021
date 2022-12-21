@@ -172,9 +172,9 @@ public:
 
         result->node = std::move(result_bn);
 
-        int step {0};
+        // int step {0};
         while (true) {
-            step++;
+            // step++;
 
             if (result->try_explode()) {
                 continue;

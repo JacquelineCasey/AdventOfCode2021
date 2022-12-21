@@ -2,7 +2,7 @@
 
 # Copied from ~/.custom_aliases
 alias G++CPPC='g++-11 -std=c++20 -Wall -Wextra -Werror -Wpedantic -nostdinc++ -nodefaultlibs -lc -isystem /usr/local/Cellar/llvm/14.0.6_1/include/c++/v1 -lc++ -lc++abi'
-alias CPPC='/usr/local/Cellar/llvm/14.0.6_1/bin/clang++ -std=c++20 -Wall -Wextra -Werror -Wpedantic'
+alias CPPC='/usr/local/Cellar/llvm/15.0.1/bin/clang++ -std=c++20 -Wall -Wextra -Werror -Wpedantic'
 
 for folder in Day*/;
 do
